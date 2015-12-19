@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <drawable name="searchview_query_field_cursor">@drawable/search_text_cursor</drawable>
+    <drawable name="searchview_button_back">@mipmap/ic_arrow_back</drawable>
+    <drawable name="searchview_button_close">@mipmap/ic_close</drawable>
+    <drawable name="searchview_button_voice">@mipmap/ic_keyboard_voice</drawable>
+</resources>

@@ -1,0 +1,5 @@
+<resources>
+    <string name="searchview_image_back">Back</string>
+    <string name="searchview_voice_cancel">Voice Cancel</string>
+    <string name="searchview_text_hint">Hint</string>
+</resources>

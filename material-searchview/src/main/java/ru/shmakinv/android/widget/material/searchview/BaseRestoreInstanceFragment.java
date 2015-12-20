@@ -34,23 +34,23 @@ import com.transitionseverywhere.Transition;
 import java.util.List;
 
 /**
- * BaseDialogFragment
+ * BaseRestoreInstanceFragment
  *
  * @author: Vyacheslav Shmakin
- * @version: 23.07.2015
+ * @version: 20.12.2015
  */
 abstract class BaseRestoreInstanceFragment extends DialogFragment {
 
-    private final String REQUEST_CLOSE_INSTANCE = "ru.shmakinv.MaterialSearchView.BaseRestoreInstanceFragment.flag.closeRequested";
-    private final String VISIBILITY_INSTANCE = "ru.shmakinv.MaterialSearchView.BaseRestoreInstanceFragment.flag.visible";
-    private final String QUERY_INSTANCE = "ru.shmakinv.MaterialSearchView.BaseRestoreInstanceFragment.text.query";
-    private final String HINT_INSTANCE = "ru.shmakinv.MaterialSearchView.BaseRestoreInstanceFragment.text.hint";
-    private final String CURSOR_POSITION_INSTANCE = "ru.shmakinv.MaterialSearchView.BaseRestoreInstanceFragment.position.cursor";
-    private final String DIALOG_TAG = "ru.shmakinv.MaterialSearchView.BaseRestoreInstanceFragment.tag";
-    private final String TYPEFACE_INSTANCE = "ru.shmakinv.MaterialSearchView.BaseRestoreInstanceFragment.typeface.value";
-    private final long ANIMATOR_DURATION_SHOW = 300L;
-    protected final long ANIMATOR_MIN_SUGGESTION_DURATION = 50L;
-    protected final long ANIMATOR_MAX_SUGGESTION_DURATION = 200L;
+    private static final String REQUEST_CLOSE_INSTANCE = "ru.shmakinv.android.widget.material.searchview.BaseRestoreInstanceFragment.flag.closeRequested";
+    private static final String VISIBILITY_INSTANCE = "ru.shmakinv.android.widget.material.searchview.BaseRestoreInstanceFragment.flag.visible";
+    private static final String QUERY_INSTANCE = "ru.shmakinv.android.widget.material.searchview.BaseRestoreInstanceFragment.text.query";
+    private static final String HINT_INSTANCE = "ru.shmakinv.android.widget.material.searchview.BaseRestoreInstanceFragment.text.hint";
+    private static final String CURSOR_POSITION_INSTANCE = "ru.shmakinv.android.widget.material.searchview.BaseRestoreInstanceFragment.position.cursor";
+    private static final String TYPEFACE_INSTANCE = "ru.shmakinv.android.widget.material.searchview.BaseRestoreInstanceFragment.typeface.value";
+    private static final long ANIMATOR_DURATION_SHOW = 300L;
+    protected static final String DIALOG_TAG = "ru.shmakinv.android.widget.material.searchview.BaseRestoreInstanceFragment.tag";
+    protected static final long ANIMATOR_MIN_SUGGESTION_DURATION = 50L;
+    protected static final long ANIMATOR_MAX_SUGGESTION_DURATION = 200L;
 
     protected Integer mMenuItemId = null;
     private float mAnimProportionX = -1;

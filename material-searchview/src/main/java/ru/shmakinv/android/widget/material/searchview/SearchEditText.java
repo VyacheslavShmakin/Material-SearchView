@@ -7,10 +7,10 @@ import android.view.KeyEvent;
 import com.devspark.robototextview.widget.RobotoEditText;
 
 /**
- * ExtendedEditText
+ * SearchEditText
  *
  * @author: Vyacheslav Shmakin
- * @version: 23.07.2015
+ * @version: 20.12.2015
  */
 class SearchEditText extends RobotoEditText {
 

@@ -10,7 +10,7 @@ import android.view.ViewGroup;
  * WrapContentLinearLayoutManager
  *
  * @author: Vyacheslav Shmakin
- * @version: 23.07.2015
+ * @version: 20.12.2015
  */
 class WrapContentLinearLayoutManager extends LinearLayoutManager {
 

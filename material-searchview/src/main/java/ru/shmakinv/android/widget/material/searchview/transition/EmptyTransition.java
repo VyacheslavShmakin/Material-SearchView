@@ -28,6 +28,12 @@ import com.transitionseverywhere.TransitionValues;
 import com.transitionseverywhere.Visibility;
 import com.transitionseverywhere.utils.ViewUtils;
 
+/**
+ * EmptyTransition
+ *
+ * @author: Vyacheslav Shmakin
+ * @version: 20.12.2015
+ */
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 class EmptyTransition extends Visibility {
 

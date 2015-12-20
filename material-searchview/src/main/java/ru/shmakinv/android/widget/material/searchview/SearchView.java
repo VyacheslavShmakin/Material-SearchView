@@ -1,5 +1,6 @@
 package ru.shmakinv.android.widget.material.searchview;
 
+import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.graphics.Rect;
@@ -33,10 +34,10 @@ import com.transitionseverywhere.TransitionSet;
 import ru.shmakinv.android.widget.material.searchview.transition.SizeTransition;
 
 /**
- * ProgressDialogFragment
+ * SearchView
  *
  * @author: Vyacheslav Shmakin
- * @version: 23.07.2015
+ * @version: 20.12.2015
  */
 public class SearchView extends BaseRestoreInstanceFragment implements
         DialogInterface.OnShowListener,
@@ -57,6 +58,11 @@ public class SearchView extends BaseRestoreInstanceFragment implements
     private OnVoiceSearchListener mOnVoiceSearchListener;
     private OnQueryTextListener mOnQueryTextListener;
     private OnToolbarRequestUpdateListener mOnToolbarRequestUpdateListener;
+
+    public static SearchView getInstance(Activity activity) {
+        SearchView searchView = (SearchView) activity.getFragmentManager().findFragmentByTag(DIALOG_TAG);
+        return searchView != null ? searchView : new SearchView();
+    }
 
     public SearchView() {
     }
@@ -151,6 +157,7 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         mCloseVoiceBtn.setOnClickListener(null);
         mNavBackBtn.setOnClickListener(null);
         mSearchEditText.setCustomSelectionActionModeCallback(null);
+        getDialog().getWindow().getDecorView().setOnTouchListener(null);
     }
 
     @Override

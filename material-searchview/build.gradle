@@ -30,12 +30,3 @@ dependencies {
     compile 'com.andkulikov:transitionseverywhere:1.6.1'
     compile 'com.github.johnkil.android-robototextview:robototextview:2.4.3'
 }
-
-publish {
-    groupId = 'com.github.VyacheslavShmakin'
-    artifactId = 'material-searchview'
-    publishVersion = '1.0.0'
-    desc = 'A search view library for Android based on DialogFragment'
-    licences = ['Apache-2.0']
-    website = 'https://github.com/VyacheslavShmakin/Material-SearchView.git'
-}

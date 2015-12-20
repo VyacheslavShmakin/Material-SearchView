@@ -38,7 +38,7 @@
                         android:background="?android:attr/selectableItemBackground"
                         android:paddingRight="@dimen/searchview_padding_horizontal_button_action"
                         android:paddingLeft="@dimen/searchview_padding_horizontal_button_action"/>
-                <ru.shmakinv.material.SearchEditText
+                <ru.shmakinv.android.widget.material.searchview.SearchEditText
                         android:inputType="textAutoComplete|textAutoCorrect"
                         android:layout_width="match_parent"
                         android:textCursorDrawable="@drawable/searchview_query_field_cursor"

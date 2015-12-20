@@ -22,14 +22,6 @@ import android.util.AttributeSet;
 import com.transitionseverywhere.ChangeBounds;
 import com.transitionseverywhere.TransitionSet;
 
-/**
- * Utility class for creating a default transition that automatically fades,
- * moves, and resizes views during a scene change.
- * <p/>
- * <p>An SizeTransition can be described in a resource file by using the
- * tag <code>autoTransition</code>, along with the other standard
- * attributes of {@link com.transitionseverywhere.R.styleable#Transition}.</p>
- */
 public class SizeTransition extends TransitionSet {
 
     /**

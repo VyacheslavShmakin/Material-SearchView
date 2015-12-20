@@ -54,8 +54,9 @@ public class SearchView extends BaseRestoreInstanceFragment implements
     private RecyclerView mSuggestionsView;
     private RecyclerView.Adapter mAdapter;
 
-    private OnVoiceSearchListener voiceSearchListener;
-    private OnQueryTextListener onQueryTextListener;
+    private OnVoiceSearchListener mOnVoiceSearchListener;
+    private OnQueryTextListener mOnQueryTextListener;
+    private OnToolbarRequestUpdateListener mOnToolbarRequestUpdateListener;
 
     public SearchView() {
     }
@@ -134,8 +135,8 @@ public class SearchView extends BaseRestoreInstanceFragment implements
     @Override
     public void onShow(DialogInterface dialog) {
         Log.d(TAG, "onShow");
-        if (toolbarRequestUpdateListener != null) {
-            toolbarRequestUpdateListener.onRequestToolbarClear();
+        if (mOnToolbarRequestUpdateListener != null) {
+            mOnToolbarRequestUpdateListener.onRequestToolbarClear();
         }
 
         animateShow(mSearchOverlay, mSearchRegion, mMenuItemId);
@@ -159,8 +160,8 @@ public class SearchView extends BaseRestoreInstanceFragment implements
     }
 
     private void onClose() {
-        if (toolbarRequestUpdateListener != null) {
-            toolbarRequestUpdateListener.onRequestToolbarRestore();
+        if (mOnToolbarRequestUpdateListener != null) {
+            mOnToolbarRequestUpdateListener.onRequestToolbarRestore();
         }
 
         if (mAdapter != null && mAdapter.getItemCount() > 0) {
@@ -283,10 +284,10 @@ public class SearchView extends BaseRestoreInstanceFragment implements
     public boolean onKey(View v, int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_ENTER
                 && event.getAction() == KeyEvent.ACTION_UP
-                && onQueryTextListener != null) {
+                && mOnQueryTextListener != null) {
 
             String query = mSearchEditText.getText().toString();
-            boolean result = onQueryTextListener.onQueryTextSubmit(query);
+            boolean result = mOnQueryTextListener.onQueryTextSubmit(query);
             if (result) {
                 submitQuery();
             }
@@ -300,7 +301,7 @@ public class SearchView extends BaseRestoreInstanceFragment implements
     }
 
     public void setOnVoiceSearchListener(OnVoiceSearchListener listener) {
-        this.voiceSearchListener = listener;
+        this.mOnVoiceSearchListener = listener;
     }
 
     @Override
@@ -308,8 +309,8 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         mQuery = s.toString();
         updateCloseVoiceState(s);
 
-        if (onQueryTextListener != null) {
-            onQueryTextListener.onQueryTextChanged(s.toString());
+        if (mOnQueryTextListener != null) {
+            mOnQueryTextListener.onQueryTextChanged(s.toString());
         }
     }
 
@@ -328,8 +329,8 @@ public class SearchView extends BaseRestoreInstanceFragment implements
     protected void onCloseVoiceClicked() {
         if (mSearchEditText != null && mSearchEditText.getText() != null && mSearchEditText.getText().toString().length() != 0) {
             mSearchEditText.getText().clear();
-        } else if (voiceSearchListener != null && hasDeviceSpeechRecognitionTool()) {
-            voiceSearchListener.onRequestVoiceSearch();
+        } else if (mOnVoiceSearchListener != null && hasDeviceSpeechRecognitionTool()) {
+            mOnVoiceSearchListener.onRequestVoiceSearch();
         }
     }
 
@@ -352,10 +353,8 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         }
     }
 
-    private OnToolbarRequestUpdateListener toolbarRequestUpdateListener;
-
     public void setOnToolbarRequestUpdateListener(OnToolbarRequestUpdateListener listener) {
-        this.toolbarRequestUpdateListener = listener;
+        this.mOnToolbarRequestUpdateListener = listener;
     }
 
     public interface OnToolbarRequestUpdateListener {
@@ -377,7 +376,7 @@ public class SearchView extends BaseRestoreInstanceFragment implements
     }
 
     public void setOnQueryTextListener(OnQueryTextListener listener) {
-        this.onQueryTextListener = listener;
+        this.mOnQueryTextListener = listener;
     }
 
     private void submitQuery() {

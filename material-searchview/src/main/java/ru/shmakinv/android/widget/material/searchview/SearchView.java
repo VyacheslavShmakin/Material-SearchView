@@ -125,6 +125,7 @@ public class SearchView extends BaseRestoreInstanceFragment implements
 
         getDialog().getWindow().setAttributes(params);
         getDialog().setCanceledOnTouchOutside(false);
+        getDialog().setOnShowListener(this);
     }
 
     @Override
@@ -147,12 +148,8 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         mNavBackBtn.setOnClickListener(mNavigationBackClickListener);
         mSearchEditText.setCustomSelectionActionModeCallback(mNotAllowedToEditCallback);
 
-        if (getDialog() != null) {
-            getDialog().setOnShowListener(this);
-
-            if (getDialog().getWindow() != null && getDialog().getWindow().getDecorView() != null) {
-                getDialog().getWindow().getDecorView().setOnTouchListener(mOnOutsideTouchListener);
-            }
+        if (getDialog() != null && getDialog().getWindow() != null && getDialog().getWindow().getDecorView() != null) {
+            getDialog().getWindow().getDecorView().setOnTouchListener(mOnOutsideTouchListener);
         }
     }
 
@@ -167,12 +164,8 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         mNavBackBtn.setOnClickListener(null);
         mSearchEditText.setCustomSelectionActionModeCallback(null);
 
-        if (getDialog() != null) {
-            getDialog().setOnShowListener(null);
-
-            if (getDialog().getWindow() != null && getDialog().getWindow().getDecorView() != null) {
-                getDialog().getWindow().getDecorView().setOnTouchListener(null);
-            }
+        if (getDialog() != null && getDialog().getWindow() != null && getDialog().getWindow().getDecorView() != null) {
+            getDialog().getWindow().getDecorView().setOnTouchListener(null);
         }
     }
 

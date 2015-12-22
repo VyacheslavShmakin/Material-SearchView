@@ -105,24 +105,15 @@ public class SearchView extends BaseRestoreInstanceFragment implements
             mSearchEditText.setSelection(mSelection);
         }
 
-        mSearchEditText.addTextChangedListener(mSearchTextWatcher);
-        mSearchEditText.setOnBackKeyListener(this);
-        mSearchEditText.setOnKeyListener(this);
-
         if (mSearchEditText != null) {
             updateCloseVoiceState(mSearchEditText.getText());
         }
-
-        mCloseVoiceBtn.setOnClickListener(mCloseVoiceClickListener);
-        mNavBackBtn.setOnClickListener(mNavigationBackClickListener);
-        mSearchEditText.setCustomSelectionActionModeCallback(mNotAllowedToEditCallback);
     }
 
     private void initWindowParams() {
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         getDialog().getWindow().setBackgroundDrawable(new ColorDrawable());
         getDialog().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-        getDialog().getWindow().getDecorView().setOnTouchListener(mOnOutsideTouchListener);
 
         WindowManager.LayoutParams params = getDialog().getWindow().getAttributes();
         params.gravity = Gravity.TOP | Gravity.FILL_HORIZONTAL;
@@ -133,9 +124,7 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         params.windowAnimations = R.style.NoAnimationWindow;
 
         getDialog().getWindow().setAttributes(params);
-
         getDialog().setCanceledOnTouchOutside(false);
-        getDialog().setOnShowListener(this);
     }
 
     @Override
@@ -149,15 +138,42 @@ public class SearchView extends BaseRestoreInstanceFragment implements
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onResume() {
+        super.onResume();
+        mSearchEditText.addTextChangedListener(mSearchTextWatcher);
+        mSearchEditText.setOnBackKeyListener(this);
+        mSearchEditText.setOnKeyListener(this);
+        mCloseVoiceBtn.setOnClickListener(mCloseVoiceClickListener);
+        mNavBackBtn.setOnClickListener(mNavigationBackClickListener);
+        mSearchEditText.setCustomSelectionActionModeCallback(mNotAllowedToEditCallback);
+
+        if (getDialog() != null) {
+            getDialog().setOnShowListener(this);
+
+            if (getDialog().getWindow() != null && getDialog().getWindow().getDecorView() != null) {
+                getDialog().getWindow().getDecorView().setOnTouchListener(mOnOutsideTouchListener);
+            }
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
         mSearchEditText.setOnKeyListener(null);
         mSearchEditText.removeTextChangedListener(mSearchTextWatcher);
         mSearchEditText.setOnBackKeyListener(null);
         mCloseVoiceBtn.setOnClickListener(null);
         mNavBackBtn.setOnClickListener(null);
         mSearchEditText.setCustomSelectionActionModeCallback(null);
-        getDialog().getWindow().getDecorView().setOnTouchListener(null);
+
+        if (getDialog() != null) {
+            getDialog().setOnShowListener(null);
+
+            if (getDialog().getWindow() != null && getDialog().getWindow().getDecorView() != null) {
+                getDialog().getWindow().getDecorView().setOnTouchListener(null);
+            }
+        }
     }
 
     @Override

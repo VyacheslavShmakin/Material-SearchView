@@ -33,3 +33,19 @@ searchView.setOnToolbarRequestUpdateListener(this);
 searchView.setOnVoiceSearchListener(this);
 searchView.setQuery("queryTest", false);
 ```
+
+SearchView should be called by using your menu item:
+``` java
+...
+@Override
+public boolean onOptionsItemSelected(MenuItem item) {
+    switch(item.getItemId()) {
+        case R.id.yourItemId:
+            return searchView.onOptionsItemSelected(getFragmentManager(), item);
+        default:
+            return super.onOptionsItemSelected(item);
+    }
+}
+...
+```
+

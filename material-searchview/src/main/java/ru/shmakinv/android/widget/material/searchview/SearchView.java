@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -42,8 +41,6 @@ import ru.shmakinv.android.widget.material.searchview.transition.SizeTransition;
 public class SearchView extends BaseRestoreInstanceFragment implements
         DialogInterface.OnShowListener,
         SearchEditText.OnBackKeyPressListener, View.OnKeyListener {
-
-    private static final String TAG = "SearchView";
 
     private RelativeLayout mRoot;
     private RelativeLayout mSearchRegion;
@@ -130,7 +127,6 @@ public class SearchView extends BaseRestoreInstanceFragment implements
 
     @Override
     public void onShow(DialogInterface dialog) {
-        Log.d(TAG, "onShow");
         if (mOnToolbarRequestUpdateListener != null) {
             mOnToolbarRequestUpdateListener.onRequestToolbarClear();
         }
@@ -234,7 +230,14 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         this.mAdapter = adapter;
         if (mSuggestionsView != null) {
             mSuggestionsView.setAdapter(this.mAdapter);
+            if (isShown()) {
+                onShowSearchAnimationEnd();
+            }
         }
+    }
+
+    public RecyclerView.Adapter getSuggestionAdapter() {
+        return this.mAdapter;
     }
 
     public void setQuery(String query, boolean submit) {
@@ -334,7 +337,7 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         if (searchText != null && searchText.length() != 0) {
             mCloseVoiceBtn.setVisibility(View.VISIBLE);
             mCloseVoiceBtn.setImageResource(R.drawable.searchview_button_close);
-        } else if (!hasDeviceSpeechRecognitionTool()) {
+        } else if (!isSpeechRecognitionToolAvailable()) {
             mCloseVoiceBtn.setVisibility(View.INVISIBLE);
         } else {
             mCloseVoiceBtn.setImageResource(R.drawable.searchview_button_voice);
@@ -345,7 +348,7 @@ public class SearchView extends BaseRestoreInstanceFragment implements
     protected void onCloseVoiceClicked() {
         if (mSearchEditText != null && mSearchEditText.getText() != null && mSearchEditText.getText().toString().length() != 0) {
             mSearchEditText.getText().clear();
-        } else if (mOnVoiceSearchListener != null && hasDeviceSpeechRecognitionTool()) {
+        } else if (mOnVoiceSearchListener != null && isSpeechRecognitionToolAvailable()) {
             mOnVoiceSearchListener.onRequestVoiceSearch();
         }
     }
@@ -362,7 +365,6 @@ public class SearchView extends BaseRestoreInstanceFragment implements
             mSearchOverlay.getHitRect(rect);
 
             if (!rect.contains((int) event.getX(), (int) event.getY())) {
-                Log.d(TAG, "View " + v + "was touched outside");
                 mCloseRequested = true;
                 onClose();
             }

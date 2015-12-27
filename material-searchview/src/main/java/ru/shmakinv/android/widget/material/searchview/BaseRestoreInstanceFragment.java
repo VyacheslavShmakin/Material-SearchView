@@ -15,11 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.ActionMode;
 import android.view.Display;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
@@ -29,7 +25,6 @@ import android.view.animation.LinearInterpolator;
 import android.view.inputmethod.InputMethodManager;
 
 import com.devspark.robototextview.util.RobotoTypefaceManager;
-import com.transitionseverywhere.Transition;
 
 import java.util.List;
 
@@ -233,69 +228,25 @@ abstract class BaseRestoreInstanceFragment extends DialogFragment {
     protected void onQueryTextChanged(Editable s) {
     }
 
-    protected boolean hasDeviceSpeechRecognitionTool() {
+    protected boolean isSpeechRecognitionToolAvailable() {
         PackageManager pm = getActivity().getPackageManager();
         List<ResolveInfo> activities = pm.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
         return activities.size() != 0;
     }
 
-    protected final ActionMode.Callback mNotAllowedToEditCallback = new ActionMode.Callback() {
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
+    protected final NotAllowedToEditCallBack mNotAllowedToEditCallback = new NotAllowedToEditCallBack();
 
+    protected final SuggestionDismissListener mSuggestionsDismissListener = new SuggestionDismissListener() {
         @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            return false;
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-
-        }
-    };
-
-    protected final Transition.TransitionListener mSuggestionsDismissListener = new Transition.TransitionListener() {
-        @Override
-        public void onTransitionStart(Transition transition) {
-        }
-
-        @Override
-        public void onTransitionEnd(Transition transition) {
+        public void onSuggestionDismissed() {
             onSuggestionsDismissed();
         }
-
-        @Override
-        public void onTransitionCancel(Transition transition) {
-        }
-
-        @Override
-        public void onTransitionPause(Transition transition) {
-        }
-
-        @Override
-        public void onTransitionResume(Transition transition) {
-        }
     };
 
-    protected final TextWatcher mSearchTextWatcher = new TextWatcher() {
+    protected final QueryTextWatcher mSearchTextWatcher = new QueryTextWatcher() {
         @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            onQueryTextChanged(s);
+        public void onQueryTextChanged(Editable s) {
+            BaseRestoreInstanceFragment.this.onQueryTextChanged(s);
         }
     };
 

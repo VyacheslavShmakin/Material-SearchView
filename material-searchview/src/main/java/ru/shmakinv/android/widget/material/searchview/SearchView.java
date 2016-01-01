@@ -36,7 +36,7 @@ import ru.shmakinv.android.widget.material.searchview.transition.SizeTransition;
  * SearchView
  *
  * @author: Vyacheslav Shmakin
- * @version: 20.12.2015
+ * @version: 01.01.2016
  */
 public class SearchView extends BaseRestoreInstanceFragment implements
         DialogInterface.OnShowListener,
@@ -54,7 +54,7 @@ public class SearchView extends BaseRestoreInstanceFragment implements
 
     private OnVoiceSearchListener mOnVoiceSearchListener;
     private OnQueryTextListener mOnQueryTextListener;
-    private OnToolbarRequestUpdateListener mOnToolbarRequestUpdateListener;
+    private OnVisibilityChangeListener mOnVisibilityChangeListener;
 
     public static SearchView getInstance(Activity activity) {
         SearchView searchView = (SearchView) activity.getFragmentManager().findFragmentByTag(DIALOG_TAG);
@@ -127,11 +127,21 @@ public class SearchView extends BaseRestoreInstanceFragment implements
 
     @Override
     public void onShow(DialogInterface dialog) {
-        if (mOnToolbarRequestUpdateListener != null) {
-            mOnToolbarRequestUpdateListener.onRequestToolbarClear();
+        if (!mVisible) {
+            mVisible = true;
+            if (mOnVisibilityChangeListener != null) {
+                mOnVisibilityChangeListener.onShow();
+            }
         }
 
         animateShow(mSearchOverlay, mSearchRegion, mMenuItemId);
+    }
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        super.onDismiss(dialog);
+        this.mSearchEditText.getText().clear();
+        this.mAdapter = null;
     }
 
     @Override
@@ -172,8 +182,8 @@ public class SearchView extends BaseRestoreInstanceFragment implements
     }
 
     private void onClose() {
-        if (mOnToolbarRequestUpdateListener != null) {
-            mOnToolbarRequestUpdateListener.onRequestToolbarRestore();
+        if (mOnVisibilityChangeListener != null) {
+            mOnVisibilityChangeListener.onDismiss();
         }
 
         if (mAdapter != null && mAdapter.getItemCount() > 0) {
@@ -242,10 +252,12 @@ public class SearchView extends BaseRestoreInstanceFragment implements
 
     public void setQuery(String query, boolean submit) {
         this.mQuery = query;
+        this.mSelection = query.length();
         if (mSearchEditText == null) {
             return;
         }
         mSearchEditText.setText(query);
+        mSearchEditText.setSelection(mSelection);
 
         if (submit) {
             submitQuery();
@@ -311,7 +323,6 @@ public class SearchView extends BaseRestoreInstanceFragment implements
                 submitQuery();
             }
         }
-
         return false;
     }
 
@@ -371,14 +382,14 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         }
     }
 
-    public void setOnToolbarRequestUpdateListener(OnToolbarRequestUpdateListener listener) {
-        this.mOnToolbarRequestUpdateListener = listener;
+    public void setOnVisibilityChangeListener(OnVisibilityChangeListener listener) {
+        this.mOnVisibilityChangeListener = listener;
     }
 
-    public interface OnToolbarRequestUpdateListener {
-        void onRequestToolbarClear();
+    public interface OnVisibilityChangeListener {
+        void onShow();
 
-        void onRequestToolbarRestore();
+        void onDismiss();
     }
 
     public boolean onOptionsItemSelected(FragmentManager manager, MenuItem item) {

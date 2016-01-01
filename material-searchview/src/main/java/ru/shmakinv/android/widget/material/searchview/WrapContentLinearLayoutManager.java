@@ -10,17 +10,16 @@ import android.view.ViewGroup;
  * WrapContentLinearLayoutManager
  *
  * @author: Vyacheslav Shmakin
- * @version: 20.12.2015
+ * @version: 01.01.2016
  */
 class WrapContentLinearLayoutManager extends LinearLayoutManager {
 
+    private final int[] mMeasuredDimension = new int[2];
     private int mChildHeight;
 
     public WrapContentLinearLayoutManager(Context context) {
         super(context, LinearLayoutManager.VERTICAL, false);
     }
-
-    private final int[] mMeasuredDimension = new int[2];
 
     @Override
     public void onMeasure(RecyclerView.Recycler recycler, RecyclerView.State state,

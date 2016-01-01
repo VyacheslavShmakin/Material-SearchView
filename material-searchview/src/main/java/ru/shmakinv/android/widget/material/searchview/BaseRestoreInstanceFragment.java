@@ -32,7 +32,7 @@ import java.util.List;
  * BaseRestoreInstanceFragment
  *
  * @author: Vyacheslav Shmakin
- * @version: 20.12.2015
+ * @version: 01.01.2016
  */
 abstract class BaseRestoreInstanceFragment extends DialogFragment {
 
@@ -50,7 +50,7 @@ abstract class BaseRestoreInstanceFragment extends DialogFragment {
     protected Integer mMenuItemId = null;
     private float mAnimProportionX = -1;
 
-    private boolean mVisible = false;
+    protected boolean mVisible = false;
     protected boolean mCloseRequested = false;
 
     protected String mQuery = null;
@@ -82,7 +82,6 @@ abstract class BaseRestoreInstanceFragment extends DialogFragment {
         transaction.add(this, DIALOG_TAG);
         transaction.commitAllowingStateLoss();
         manager.executePendingTransactions();
-        mVisible = true;
     }
 
     protected void setupTypeface(int typefaceValue) {
@@ -112,7 +111,12 @@ abstract class BaseRestoreInstanceFragment extends DialogFragment {
     @Override
     public void onDismiss(DialogInterface dialog) {
         super.onDismiss(dialog);
-        mVisible = false;
+        this.mVisible = false;
+        this.mCloseRequested = false;
+        this.mQuery = null;
+        this.mHint = null;
+        this.mSelection = -1;
+        this.mTypefaceValue = RobotoTypefaceManager.Typeface.ROBOTO_REGULAR;
     }
 
     @Override

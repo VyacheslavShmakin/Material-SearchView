@@ -36,7 +36,7 @@ import ru.shmakinv.android.widget.material.searchview.transition.SizeTransition;
  * SearchView
  *
  * @author: Vyacheslav Shmakin
- * @version: 01.01.2016
+ * @version: 02.01.2016
  */
 public class SearchView extends BaseRestoreInstanceFragment implements
         DialogInterface.OnShowListener,
@@ -135,6 +135,11 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         }
 
         animateShow(mSearchOverlay, mSearchRegion, mMenuItemId);
+    }
+
+    @Override
+    public void dismiss() {
+        onClose();
     }
 
     @Override

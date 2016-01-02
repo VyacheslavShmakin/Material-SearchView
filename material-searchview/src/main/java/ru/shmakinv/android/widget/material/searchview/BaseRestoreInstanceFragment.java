@@ -85,7 +85,7 @@ abstract class BaseRestoreInstanceFragment extends DialogFragment {
     }
 
     protected void setupTypeface(int typefaceValue) {
-        this.mTypefaceValue = typefaceValue;        
+        this.mTypefaceValue = typefaceValue;
     }
 
     @Override
@@ -117,11 +117,6 @@ abstract class BaseRestoreInstanceFragment extends DialogFragment {
         this.mHint = null;
         this.mSelection = -1;
         this.mTypefaceValue = RobotoTypefaceManager.Typeface.ROBOTO_REGULAR;
-    }
-
-    @Override
-    public void dismiss() {
-        super.dismissAllowingStateLoss();
     }
 
     public boolean isShown() {
@@ -200,7 +195,7 @@ abstract class BaseRestoreInstanceFragment extends DialogFragment {
                     hideKeyboard();
                     view.setVisibility(View.INVISIBLE);
                     mCloseRequested = false;
-                    getDialog().cancel();
+                    dismissAllowingStateLoss();
                 }
 
                 @Override
@@ -219,7 +214,7 @@ abstract class BaseRestoreInstanceFragment extends DialogFragment {
             hideKeyboard();
             view.setVisibility(View.INVISIBLE);
             mCloseRequested = false;
-            getDialog().cancel();
+            dismissAllowingStateLoss();
         }
     }
 

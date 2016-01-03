@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -20,7 +21,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -36,7 +36,7 @@ import ru.shmakinv.android.widget.material.searchview.transition.SizeTransition;
  * SearchView
  *
  * @author: Vyacheslav Shmakin
- * @version: 02.01.2016
+ * @version: 03.01.2016
  */
 public class SearchView extends BaseRestoreInstanceFragment implements
         DialogInterface.OnShowListener,
@@ -51,6 +51,7 @@ public class SearchView extends BaseRestoreInstanceFragment implements
     private SearchEditText mSearchEditText;
     private RecyclerView mSuggestionsView;
     private RecyclerView.Adapter mAdapter;
+    private RecyclerView.ItemDecoration mDecoration;
 
     private OnVoiceSearchListener mOnVoiceSearchListener;
     private OnQueryTextListener mOnQueryTextListener;
@@ -89,6 +90,11 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         mSuggestionsView.setLayoutManager(
                 new WrapContentLinearLayoutManager(getActivity()));
 
+        if (mDecoration != null) {
+            mSuggestionsView.removeItemDecoration(mDecoration);
+            mSuggestionsView.addItemDecoration(mDecoration);
+        }
+
         Typeface typeface = RobotoTypefaceManager.obtainTypeface(
                 getActivity().getApplicationContext(),
                 this.mTypefaceValue);
@@ -121,6 +127,7 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         params.windowAnimations = R.style.NoAnimationWindow;
 
         getDialog().getWindow().setAttributes(params);
+        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         getDialog().setCanceledOnTouchOutside(false);
         getDialog().setOnShowListener(this);
     }
@@ -191,16 +198,17 @@ public class SearchView extends BaseRestoreInstanceFragment implements
             mOnVisibilityChangeListener.onDismiss();
         }
 
-        if (mAdapter != null && mAdapter.getItemCount() > 0) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+                && mAdapter != null && mAdapter.getItemCount() > 0) {
+
             TransitionSet transition = new SizeTransition()
                     .setDuration(ANIMATOR_MIN_SUGGESTION_DURATION)
                     .setInterpolator(new LinearInterpolator())
                     .addListener(mSuggestionsDismissListener);
 
             TransitionManager.beginDelayedTransition(mSearchOverlay, transition);
-
-            mSuggestionsRegion.setLayoutParams(new FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.MATCH_PARENT,
+            mSuggestionsRegion.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
                     0));
         } else {
             animateDismiss(mSearchOverlay, mSearchRegion, mMenuItemId);
@@ -249,6 +257,20 @@ public class SearchView extends BaseRestoreInstanceFragment implements
                 onShowSearchAnimationEnd();
             }
         }
+    }
+
+    public void addItemDecoration(RecyclerView.ItemDecoration decoration) {
+        if (mSuggestionsView != null) {
+            if (this.mDecoration != null) {
+                mSuggestionsView.removeItemDecoration(this.mDecoration);
+            }
+            mSuggestionsView.addItemDecoration(decoration);
+        }
+        this.mDecoration = decoration;
+    }
+
+    public RecyclerView.ItemDecoration getItemDecoration() {
+        return this.mDecoration;
     }
 
     public RecyclerView.Adapter getSuggestionAdapter() {
@@ -305,9 +327,9 @@ public class SearchView extends BaseRestoreInstanceFragment implements
 
             TransitionManager.beginDelayedTransition(mRoot, transition);
 
-            mSuggestionsRegion.setLayoutParams(new FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.MATCH_PARENT,
-                    FrameLayout.LayoutParams.WRAP_CONTENT));
+            mSuggestionsRegion.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT));
         }
     }
 

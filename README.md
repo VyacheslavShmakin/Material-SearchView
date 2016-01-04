@@ -7,7 +7,7 @@ Download
 Gradle:
 
 ```groovy
-compile 'com.github.VyacheslavShmakin.material-searchview:1.0.7'
+compile 'com.github.VyacheslavShmakin.material-searchview:1.0.8'
 ```
 
 Maven:
@@ -16,7 +16,7 @@ Maven:
 <dependency>
     <groupId>com.github.VyacheslavShmakin</groupId>
     <artifactId>material-searchview</artifactId>
-    <version>1.0.7</version>
+    <version>1.0.8</version>
     <type>aar</type>
 </dependency>
 ```
@@ -30,7 +30,6 @@ SearchView searchView = SearchView.getInstance(this);
 DataAdapter adapter = new DataAdapter(this, getItems());
 searchView.setSuggestionAdapter(adapter);
 searchView.setOnVisibilityChangeListener(this);
-searchView.setOnVoiceSearchListener(this);
 searchView.setQuery("queryTest", false);
 ```
 

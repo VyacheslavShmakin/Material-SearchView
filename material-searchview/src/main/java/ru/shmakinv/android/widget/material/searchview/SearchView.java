@@ -3,11 +3,14 @@ package ru.shmakinv.android.widget.material.searchview;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.speech.RecognizerIntent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -21,6 +24,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -29,6 +33,8 @@ import com.devspark.robototextview.util.RobotoTypefaceManager;
 import com.devspark.robototextview.util.RobotoTypefaceUtils;
 import com.transitionseverywhere.TransitionManager;
 import com.transitionseverywhere.TransitionSet;
+
+import java.util.List;
 
 import ru.shmakinv.android.widget.material.searchview.transition.SizeTransition;
 
@@ -42,6 +48,9 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         DialogInterface.OnShowListener,
         SearchEditText.OnBackKeyPressListener, View.OnKeyListener {
 
+    public static final int RECOGNIZER_CODE = 100500;
+    private static final long SPEECH_RECOGNITION_DELAY = 300L;
+
     private RelativeLayout mRoot;
     private RelativeLayout mSearchRegion;
     private LinearLayout mSuggestionsRegion;
@@ -53,9 +62,11 @@ public class SearchView extends BaseRestoreInstanceFragment implements
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.ItemDecoration mDecoration;
 
-    private OnVoiceSearchListener mOnVoiceSearchListener;
     private OnQueryTextListener mOnQueryTextListener;
     private OnVisibilityChangeListener mOnVisibilityChangeListener;
+
+    private boolean mShowSearchAnimationFinished = false;
+    private boolean mSpeechRecognized = false;
 
     public static SearchView getInstance(Activity activity) {
         SearchView searchView = (SearchView) activity.getFragmentManager().findFragmentByTag(DIALOG_TAG);
@@ -103,13 +114,11 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         mSearchEditText.setText(mQuery);
         mSearchEditText.setHint(mHint);
         if (mSelection == -1) {
-            mSearchEditText.setSelection(mSearchEditText.length());
+            if (mQuery != null) {
+                mSearchEditText.setSelection(mQuery.length());
+            }
         } else {
             mSearchEditText.setSelection(mSelection);
-        }
-
-        if (mSearchEditText != null) {
-            updateCloseVoiceState(mSearchEditText.getText());
         }
     }
 
@@ -169,12 +178,21 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         if (getDialog() != null && getDialog().getWindow() != null && getDialog().getWindow().getDecorView() != null) {
             getDialog().getWindow().getDecorView().setOnTouchListener(mOnOutsideTouchListener);
         }
+        updateCloseVoiceState(mQuery);
+        if (mSpeechRecognized) {
+            mSpeechRecognized = false;
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    setQuery(mQuery, true);
+                }
+            }, SPEECH_RECOGNITION_DELAY);
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-
         mSearchEditText.setOnKeyListener(null);
         mSearchEditText.removeTextChangedListener(mSearchTextWatcher);
         mSearchEditText.setOnBackKeyListener(null);
@@ -207,8 +225,9 @@ public class SearchView extends BaseRestoreInstanceFragment implements
                     .addListener(mSuggestionsDismissListener);
 
             TransitionManager.beginDelayedTransition(mSearchOverlay, transition);
-            mSuggestionsRegion.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
+
+            mSuggestionsRegion.setLayoutParams(new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
                     0));
         } else {
             animateDismiss(mSearchOverlay, mSearchRegion, mMenuItemId);
@@ -224,15 +243,10 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         return false;
     }
 
-    public void receiveVoiceSearchResult(String result) {
-        String text = mSearchEditText.getText() + " " + result;
-        mSearchEditText.setText(text);
-    }
-
     @Override
     public void show(FragmentManager manager) {
         if (isShown()) {
-            dismiss();
+            dismissAllowingStateLoss();
         }
         super.show(manager);
     }
@@ -253,7 +267,7 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         this.mAdapter = adapter;
         if (mSuggestionsView != null) {
             mSuggestionsView.setAdapter(this.mAdapter);
-            if (isShown()) {
+            if (isShown() && mShowSearchAnimationFinished) {
                 onShowSearchAnimationEnd();
             }
         }
@@ -277,6 +291,14 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         return this.mAdapter;
     }
 
+    public void setQuery(int id) {
+        setQuery(getString(id));
+    }
+
+    public void setQuery(String query) {
+        setQuery(query, false);
+    }
+
     public void setQuery(String query, boolean submit) {
         this.mQuery = query;
         this.mSelection = query.length();
@@ -286,6 +308,10 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         mSearchEditText.setText(query);
         mSearchEditText.setSelection(mSelection);
 
+        if (mOnQueryTextListener != null) {
+            mOnQueryTextListener.onQueryTextChanged(query);
+            submit = submit && mOnQueryTextListener.onQueryTextSubmit(query);
+        }
         if (submit) {
             submitQuery();
         }
@@ -302,6 +328,10 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         return mSearchEditText.getHint().toString();
     }
 
+    public void setHint(int id) {
+        setHint(getString(id));
+    }
+
     public void setHint(String hint) {
         this.mHint = hint;
         if (mSearchEditText != null) {
@@ -310,7 +340,15 @@ public class SearchView extends BaseRestoreInstanceFragment implements
     }
 
     @Override
+    protected void animateShow(View view, View metricsView, int itemId) {
+        mShowSearchAnimationFinished = false;
+        super.animateShow(view, metricsView, itemId);
+    }
+
+    @Override
     protected void onShowSearchAnimationEnd() {
+        mShowSearchAnimationFinished = true;
+
         if (mAdapter != null && mAdapter.getItemCount() > 0) {
             mSuggestionsView.setAdapter(mAdapter);
 
@@ -327,9 +365,9 @@ public class SearchView extends BaseRestoreInstanceFragment implements
 
             TransitionManager.beginDelayedTransition(mRoot, transition);
 
-            mSuggestionsRegion.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT));
+            mSuggestionsRegion.setLayoutParams(new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT));
         }
     }
 
@@ -345,33 +383,22 @@ public class SearchView extends BaseRestoreInstanceFragment implements
                 && mOnQueryTextListener != null) {
 
             String query = mSearchEditText.getText().toString();
-            boolean result = mOnQueryTextListener.onQueryTextSubmit(query);
-            if (result) {
-                submitQuery();
-            }
+            setQuery(query, true);
         }
         return false;
-    }
-
-    public interface OnVoiceSearchListener {
-        void onRequestVoiceSearch();
-    }
-
-    public void setOnVoiceSearchListener(OnVoiceSearchListener listener) {
-        this.mOnVoiceSearchListener = listener;
     }
 
     @Override
     protected void onQueryTextChanged(Editable s) {
         mQuery = s.toString();
-        updateCloseVoiceState(s);
+        updateCloseVoiceState(mQuery);
 
         if (mOnQueryTextListener != null) {
-            mOnQueryTextListener.onQueryTextChanged(s.toString());
+            mOnQueryTextListener.onQueryTextChanged(mQuery);
         }
     }
 
-    private void updateCloseVoiceState(Editable searchText) {
+    private void updateCloseVoiceState(String searchText) {
         if (searchText != null && searchText.length() != 0) {
             mCloseVoiceBtn.setVisibility(View.VISIBLE);
             mCloseVoiceBtn.setImageResource(R.drawable.searchview_button_close);
@@ -386,8 +413,11 @@ public class SearchView extends BaseRestoreInstanceFragment implements
     protected void onCloseVoiceClicked() {
         if (mSearchEditText != null && mSearchEditText.getText() != null && mSearchEditText.getText().toString().length() != 0) {
             mSearchEditText.getText().clear();
-        } else if (mOnVoiceSearchListener != null && isSpeechRecognitionToolAvailable()) {
-            mOnVoiceSearchListener.onRequestVoiceSearch();
+            mQuery = "";
+        } else if (isSpeechRecognitionToolAvailable()) {
+            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            startActivityForResult(intent, RECOGNIZER_CODE);
         }
     }
 
@@ -439,5 +469,18 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         setSuggestionAdapter(null);
         mSearchEditText.clearFocus();
         hideKeyboard();
+        dismiss();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == RECOGNIZER_CODE && resultCode == Activity.RESULT_OK) {
+            List<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            if (results != null && results.size() > 0) {
+                mQuery = results.get(0);
+                mSpeechRecognized = true;
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

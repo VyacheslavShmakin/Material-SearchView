@@ -53,6 +53,7 @@ abstract class BaseRestoreInstanceFragment extends DialogFragment {
 
     protected boolean mVisible = false;
     protected boolean mCloseRequested = false;
+    protected boolean mCloseAnimationRunning = false;
 
     protected String mQuery = null;
     protected String mHint = null;
@@ -172,6 +173,12 @@ abstract class BaseRestoreInstanceFragment extends DialogFragment {
     }
 
     protected void animateDismiss(final View view, final View metricsView, final int itemId) {
+        if (!mCloseAnimationRunning) {
+            mCloseAnimationRunning = true;
+        } else {
+            return;
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
             int centerX = calculateCenterX(itemId);
@@ -192,11 +199,7 @@ abstract class BaseRestoreInstanceFragment extends DialogFragment {
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    getDialog().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-                    hideKeyboard();
-                    view.setVisibility(View.INVISIBLE);
-                    mCloseRequested = false;
-                    dismissAllowingStateLoss();
+                    finishClosing(view);
                 }
 
                 @Override
@@ -211,12 +214,17 @@ abstract class BaseRestoreInstanceFragment extends DialogFragment {
             animatorHide.setDuration(ANIMATOR_DURATION_SHOW);
             animatorHide.start();
         } else {
-            getDialog().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-            hideKeyboard();
-            view.setVisibility(View.INVISIBLE);
-            mCloseRequested = false;
-            dismissAllowingStateLoss();
+            finishClosing(view);
         }
+    }
+
+    protected void finishClosing(View view) {
+        getDialog().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        hideKeyboard();
+        view.setVisibility(View.INVISIBLE);
+        mCloseRequested = false;
+        mCloseAnimationRunning = false;
+        dismissAllowingStateLoss();
     }
 
     protected void onShowSearchAnimationEnd() {

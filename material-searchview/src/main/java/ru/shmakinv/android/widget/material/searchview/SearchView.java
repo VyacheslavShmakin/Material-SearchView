@@ -102,7 +102,7 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         if (mAdapter != null) {
             mSuggestionsView.setAdapter(mAdapter);
         }
-        mSuggestionsView.setLayoutManager(new WrapContentLinearLayoutManager(getActivity()));
+        mSuggestionsView.setLayoutManager(new VerticalLinearLayoutManager(getActivity()));
 
         if (mDecoration != null) {
             mSuggestionsView.removeItemDecoration(mDecoration);
@@ -383,7 +383,7 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         if (mAdapter != null && mAdapter.getItemCount() > 0) {
             mSuggestionsView.setAdapter(mAdapter);
 
-            int itemHeight = ((WrapContentLinearLayoutManager) mSuggestionsView.getLayoutManager()).getChildHeight();
+            int itemHeight = ((VerticalLinearLayoutManager) mSuggestionsView.getLayoutManager()).getChildHeight();
             int itemCount = mAdapter.getItemCount();
 
             long duration = Math.max(

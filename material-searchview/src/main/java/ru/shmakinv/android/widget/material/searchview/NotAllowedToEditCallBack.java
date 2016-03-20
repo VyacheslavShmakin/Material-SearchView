@@ -7,8 +7,8 @@ import android.view.MenuItem;
 /**
  * NotAllowedToEditCallBack
  *
- * @author: Vyacheslav Shmakin
- * @version: 27.12.2015
+ * @author Vyacheslav Shmakin
+ * @version 27.12.2015
  */
 class NotAllowedToEditCallBack implements ActionMode.Callback {
     @Override

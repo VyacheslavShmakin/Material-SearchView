@@ -14,6 +14,7 @@ import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -31,8 +32,8 @@ import java.util.List;
 /**
  * BaseRestoreInstanceFragment
  *
- * @author: Vyacheslav Shmakin
- * @version: 01.01.2016
+ * @author Vyacheslav Shmakin
+ * @version 01.01.2016
  */
 abstract class BaseRestoreInstanceFragment extends DialogFragment {
 
@@ -72,7 +73,7 @@ abstract class BaseRestoreInstanceFragment extends DialogFragment {
         }
     }
 
-    public void show(final FragmentManager manager) {
+    public void show(@NonNull final FragmentManager manager) {
         FragmentTransaction transaction = manager.beginTransaction();
         Fragment prev = manager.findFragmentByTag(DIALOG_TAG);
         if (prev != null) {
@@ -123,7 +124,7 @@ abstract class BaseRestoreInstanceFragment extends DialogFragment {
         return mVisible;
     }
 
-    protected void animateShow(final View view, final View metricsView, final int itemId) {
+    protected void animateShow(@NonNull final View view, @NonNull final View metricsView, final int itemId) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
             int centerX = calculateCenterX(itemId);

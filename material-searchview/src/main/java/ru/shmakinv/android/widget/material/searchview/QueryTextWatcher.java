@@ -6,8 +6,8 @@ import android.text.TextWatcher;
 /**
  * QueryTextWatcher
  *
- * @author: Vyacheslav Shmakin
- * @version: 27.12.2015
+ * @author Vyacheslav Shmakin
+ * @version 27.12.2015
  */
 abstract class QueryTextWatcher implements TextWatcher {
     @Override

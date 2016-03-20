@@ -20,6 +20,7 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,8 +32,8 @@ import com.transitionseverywhere.utils.ViewUtils;
 /**
  * EmptyTransition
  *
- * @author: Vyacheslav Shmakin
- * @version: 20.12.2015
+ * @author Vyacheslav Shmakin
+ * @version 20.12.2015
  */
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 class EmptyTransition extends Visibility {
@@ -48,7 +49,8 @@ class EmptyTransition extends Visibility {
     /**
      * Utility method to handle creating and running the Animator.
      */
-    private Animator createAnimation(View view, int endAlpha) {
+    @SuppressWarnings("SameParameterValue")
+    private Animator createAnimation(@NonNull View view, int endAlpha) {
         return ObjectAnimator.ofFloat(view, ViewUtils.getAlphaProperty(), endAlpha);
     }
 

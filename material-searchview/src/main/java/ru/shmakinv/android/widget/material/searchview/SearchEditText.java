@@ -9,8 +9,8 @@ import com.devspark.robototextview.widget.RobotoEditText;
 /**
  * SearchEditText
  *
- * @author: Vyacheslav Shmakin
- * @version: 20.12.2015
+ * @author Vyacheslav Shmakin
+ * @version 20.12.2015
  */
 class SearchEditText extends RobotoEditText {
 

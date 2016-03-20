@@ -1,6 +1,7 @@
 package ru.shmakinv.android.widget.material.searchview;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,6 +12,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.speech.RecognizerIntent;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -41,12 +44,13 @@ import ru.shmakinv.android.widget.material.searchview.transition.SizeTransition;
 /**
  * SearchView
  *
- * @author: Vyacheslav Shmakin
- * @version: 03.01.2016
+ * @author Vyacheslav Shmakin
+ * @version 20.03.2016
  */
 public class SearchView extends BaseRestoreInstanceFragment implements
         DialogInterface.OnShowListener,
-        SearchEditText.OnBackKeyPressListener, View.OnKeyListener {
+        SearchEditText.OnBackKeyPressListener,
+        View.OnKeyListener {
 
     public static final int RECOGNIZER_CODE = 100500;
     private static final long SPEECH_RECOGNITION_DELAY = 300L;
@@ -68,7 +72,8 @@ public class SearchView extends BaseRestoreInstanceFragment implements
     private boolean mShowSearchAnimationFinished = false;
     private boolean mSpeechRecognized = false;
 
-    public static SearchView getInstance(Activity activity) {
+    @NonNull
+    public static SearchView getInstance(@NonNull Activity activity) {
         SearchView searchView = (SearchView) activity.getFragmentManager().findFragmentByTag(DIALOG_TAG);
         return searchView != null ? searchView : new SearchView();
     }
@@ -82,11 +87,10 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         final View dialogLayout = inflater.inflate(R.layout.search_view_layout, container, true);
         initViews(dialogLayout);
         initWindowParams();
-
         return dialogLayout;
     }
 
-    private void initViews(final View layout) {
+    private void initViews(@NonNull final View layout) {
         mRoot = (RelativeLayout) layout.findViewById(R.id.root);
         mSearchOverlay = (CardView) layout.findViewById(R.id.search_overlay);
         mNavBackBtn = (ImageButton) layout.findViewById(R.id.ibtn_navigation_back);
@@ -98,8 +102,7 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         if (mAdapter != null) {
             mSuggestionsView.setAdapter(mAdapter);
         }
-        mSuggestionsView.setLayoutManager(
-                new WrapContentLinearLayoutManager(getActivity()));
+        mSuggestionsView.setLayoutManager(new WrapContentLinearLayoutManager(getActivity()));
 
         if (mDecoration != null) {
             mSuggestionsView.removeItemDecoration(mDecoration);
@@ -109,7 +112,7 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         Typeface typeface = RobotoTypefaceManager.obtainTypeface(
                 getActivity().getApplicationContext(),
                 this.mTypefaceValue);
-        RobotoTypefaceUtils.setup(mSearchEditText, typeface);
+        RobotoTypefaceUtils.setUp(mSearchEditText, typeface);
 
         mSearchEditText.setText(mQuery);
         mSearchEditText.setHint(mHint);
@@ -123,11 +126,21 @@ public class SearchView extends BaseRestoreInstanceFragment implements
     }
 
     private void initWindowParams() {
-        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        getDialog().getWindow().setBackgroundDrawable(new ColorDrawable());
-        getDialog().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        Dialog dialog = getDialog();
+        Window window = null;
+        if (dialog != null) {
+            window = dialog.getWindow();
+        }
 
-        WindowManager.LayoutParams params = getDialog().getWindow().getAttributes();
+        if (dialog == null || window == null) {
+            return;
+        }
+
+        window.requestFeature(Window.FEATURE_NO_TITLE);
+        window.setBackgroundDrawable(new ColorDrawable());
+        window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+
+        WindowManager.LayoutParams params = window.getAttributes();
         params.gravity = Gravity.TOP | Gravity.FILL_HORIZONTAL;
         params.x = 0;
         params.y = 0;
@@ -135,10 +148,10 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         params.height = ViewGroup.LayoutParams.MATCH_PARENT;
         params.windowAnimations = R.style.NoAnimationWindow;
 
-        getDialog().getWindow().setAttributes(params);
-        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-        getDialog().setCanceledOnTouchOutside(false);
-        getDialog().setOnShowListener(this);
+        window.setAttributes(params);
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setOnShowListener(this);
     }
 
     @Override
@@ -149,7 +162,6 @@ public class SearchView extends BaseRestoreInstanceFragment implements
                 mOnVisibilityChangeListener.onShow();
             }
         }
-
         animateShow(mSearchOverlay, mSearchRegion, mMenuItemId);
     }
 
@@ -174,10 +186,8 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         mCloseVoiceBtn.setOnClickListener(mCloseVoiceClickListener);
         mNavBackBtn.setOnClickListener(mNavigationBackClickListener);
         mSearchEditText.setCustomSelectionActionModeCallback(mNotAllowedToEditCallback);
+        setUpDialogTouchListener(mOnOutsideTouchListener);
 
-        if (getDialog() != null && getDialog().getWindow() != null && getDialog().getWindow().getDecorView() != null) {
-            getDialog().getWindow().getDecorView().setOnTouchListener(mOnOutsideTouchListener);
-        }
         updateCloseVoiceState(mQuery);
         if (mSpeechRecognized) {
             mSpeechRecognized = false;
@@ -199,9 +209,25 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         mCloseVoiceBtn.setOnClickListener(null);
         mNavBackBtn.setOnClickListener(null);
         mSearchEditText.setCustomSelectionActionModeCallback(null);
+        setUpDialogTouchListener(null);
+    }
 
-        if (getDialog() != null && getDialog().getWindow() != null && getDialog().getWindow().getDecorView() != null) {
-            getDialog().getWindow().getDecorView().setOnTouchListener(null);
+    @Nullable
+    private View getDecorView() {
+        Dialog dialog = getDialog();
+        if (dialog != null) {
+            Window window = dialog.getWindow();
+            if (window != null) {
+                return window.getDecorView();
+            }
+        }
+        return null;
+    }
+
+    private void setUpDialogTouchListener(View.OnTouchListener listener) {
+        View view = getDecorView();
+        if (view != null) {
+            view.setOnTouchListener(listener);
         }
     }
 
@@ -244,7 +270,7 @@ public class SearchView extends BaseRestoreInstanceFragment implements
     }
 
     @Override
-    public void show(FragmentManager manager) {
+    public void show(@NonNull FragmentManager manager) {
         if (isShown()) {
             dismissAllowingStateLoss();
         }
@@ -259,11 +285,12 @@ public class SearchView extends BaseRestoreInstanceFragment implements
                 typefaceValue);
 
         if (mSearchEditText != null) {
-            RobotoTypefaceUtils.setup(mSearchEditText, typeface);
+            RobotoTypefaceUtils.setUp(mSearchEditText, typeface);
         }
     }
 
-    public void setSuggestionAdapter(RecyclerView.Adapter adapter) {
+    @SuppressWarnings("SameParameterValue")
+    public void setSuggestionAdapter(@NonNull RecyclerView.Adapter adapter) {
         this.mAdapter = adapter;
         if (mSuggestionsView != null) {
             mSuggestionsView.setAdapter(this.mAdapter);
@@ -273,7 +300,7 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         }
     }
 
-    public void addItemDecoration(RecyclerView.ItemDecoration decoration) {
+    public void addItemDecoration(@NonNull RecyclerView.ItemDecoration decoration) {
         if (mSuggestionsView != null) {
             if (this.mDecoration != null) {
                 mSuggestionsView.removeItemDecoration(this.mDecoration);
@@ -283,10 +310,12 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         this.mDecoration = decoration;
     }
 
+    @Nullable
     public RecyclerView.ItemDecoration getItemDecoration() {
         return this.mDecoration;
     }
 
+    @Nullable
     public RecyclerView.Adapter getSuggestionAdapter() {
         return this.mAdapter;
     }
@@ -295,11 +324,11 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         setQuery(getString(id));
     }
 
-    public void setQuery(String query) {
+    public void setQuery(@NonNull String query) {
         setQuery(query, false);
     }
 
-    public void setQuery(String query, boolean submit) {
+    public void setQuery(@NonNull String query, boolean submit) {
         this.mQuery = query;
         this.mSelection = query.length();
         if (mSearchEditText == null) {
@@ -317,10 +346,12 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         }
     }
 
+    @Nullable
     public String getQuery() {
         return mQuery;
     }
 
+    @Nullable
     public String getHint() {
         if (mSearchEditText == null) {
             return mHint;
@@ -332,7 +363,7 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         setHint(getString(id));
     }
 
-    public void setHint(String hint) {
+    public void setHint(@NonNull String hint) {
         this.mHint = hint;
         if (mSearchEditText != null) {
             mSearchEditText.setHint(hint);
@@ -340,7 +371,7 @@ public class SearchView extends BaseRestoreInstanceFragment implements
     }
 
     @Override
-    protected void animateShow(View view, View metricsView, int itemId) {
+    protected void animateShow(@NonNull View view, @NonNull View metricsView, int itemId) {
         mShowSearchAnimationFinished = false;
         super.animateShow(view, metricsView, itemId);
     }
@@ -389,7 +420,7 @@ public class SearchView extends BaseRestoreInstanceFragment implements
     }
 
     @Override
-    protected void onQueryTextChanged(Editable s) {
+    protected void onQueryTextChanged(@NonNull Editable s) {
         mQuery = s.toString();
         updateCloseVoiceState(mQuery);
 
@@ -398,7 +429,7 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         }
     }
 
-    private void updateCloseVoiceState(String searchText) {
+    private void updateCloseVoiceState(@Nullable String searchText) {
         if (searchText != null && searchText.length() != 0) {
             mCloseVoiceBtn.setVisibility(View.VISIBLE);
             mCloseVoiceBtn.setImageResource(R.drawable.searchview_button_close);
@@ -427,7 +458,7 @@ public class SearchView extends BaseRestoreInstanceFragment implements
     }
 
     @Override
-    protected void onOutsideTouch(View v, MotionEvent event) {
+    protected void onOutsideTouch(@NonNull View v, @NonNull MotionEvent event) {
         if (!mCloseRequested) {
             Rect rect = new Rect();
             mSearchOverlay.getHitRect(rect);
@@ -445,10 +476,10 @@ public class SearchView extends BaseRestoreInstanceFragment implements
 
     public interface OnVisibilityChangeListener {
         void onShow();
-
         void onDismiss();
     }
 
+    @SuppressWarnings("SameReturnValue")
     public boolean onOptionsItemSelected(FragmentManager manager, MenuItem item) {
         this.mMenuItemId = item.getItemId();
         show(manager);
@@ -456,9 +487,8 @@ public class SearchView extends BaseRestoreInstanceFragment implements
     }
 
     public interface OnQueryTextListener {
-        boolean onQueryTextSubmit(String query);
-
-        void onQueryTextChanged(String newText);
+        boolean onQueryTextSubmit(@NonNull String query);
+        void onQueryTextChanged(@NonNull String newText);
     }
 
     public void setOnQueryTextListener(OnQueryTextListener listener) {

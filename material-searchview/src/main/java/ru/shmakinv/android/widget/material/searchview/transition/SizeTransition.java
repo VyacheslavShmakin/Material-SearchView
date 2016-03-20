@@ -25,8 +25,8 @@ import com.transitionseverywhere.TransitionSet;
 /**
  * SizeTransition
  *
- * @author: Vyacheslav Shmakin
- * @version: 20.12.2015
+ * @author Vyacheslav Shmakin
+ * @version 20.12.2015
  */
 public class SizeTransition extends TransitionSet {
 

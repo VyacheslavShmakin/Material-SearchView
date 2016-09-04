@@ -7,7 +7,7 @@ Download
 Gradle:
 
 ```groovy
-compile 'com.github.VyacheslavShmakin.material-searchview:1.0.9'
+compile 'com.github.VyacheslavShmakin:material-searchview:1.0.9'
 ```
 
 Maven:

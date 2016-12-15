@@ -29,3 +29,4 @@ proguard/
 
 # Log Files
 *.log
+/material-searchview/material-searchview.iml

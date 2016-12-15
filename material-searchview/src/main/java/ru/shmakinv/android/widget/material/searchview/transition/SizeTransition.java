@@ -20,6 +20,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 
 import com.transitionseverywhere.ChangeBounds;
+import com.transitionseverywhere.EmptyTransition;
 import com.transitionseverywhere.TransitionSet;
 
 /**

@@ -7,7 +7,7 @@ Download
 Gradle:
 
 ```groovy
-compile 'com.github.VyacheslavShmakin.material-searchview:1.0.9'
+compile 'com.github.VyacheslavShmakin.material-searchview:1.1.1'
 ```
 
 Maven:
@@ -16,7 +16,7 @@ Maven:
 <dependency>
     <groupId>com.github.VyacheslavShmakin</groupId>
     <artifactId>material-searchview</artifactId>
-    <version>1.0.9</version>
+    <version>1.1.1</version>
     <type>aar</type>
 </dependency>
 ```

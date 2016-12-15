@@ -52,7 +52,7 @@ public class SearchView extends BaseRestoreInstanceFragment implements
         SearchEditText.OnBackKeyPressListener,
         View.OnKeyListener {
 
-    public static final int RECOGNIZER_CODE = 100500;
+    public static final int RECOGNIZER_CODE = 1024;
     private static final long SPEECH_RECOGNITION_DELAY = 300L;
 
     private RelativeLayout mRoot;
@@ -290,7 +290,7 @@ public class SearchView extends BaseRestoreInstanceFragment implements
     }
 
     @SuppressWarnings("SameParameterValue")
-    public void setSuggestionAdapter(@NonNull RecyclerView.Adapter adapter) {
+    public void setSuggestionAdapter(@Nullable RecyclerView.Adapter adapter) {
         this.mAdapter = adapter;
         if (mSuggestionsView != null) {
             mSuggestionsView.setAdapter(this.mAdapter);

@@ -12,7 +12,7 @@ import com.devspark.robototextview.widget.RobotoEditText;
  * @author Vyacheslav Shmakin
  * @version 20.12.2015
  */
-class SearchEditText extends RobotoEditText {
+public class SearchEditText extends RobotoEditText {
 
     private OnBackKeyPressListener mOnBackKeyPressListener;
 

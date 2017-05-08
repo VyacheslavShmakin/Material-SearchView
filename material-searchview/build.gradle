@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.novoda.bintray-release'
 
 android {
     compileSdkVersion 25
@@ -28,13 +27,4 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:25.3.1'
     compile 'com.andkulikov:transitionseverywhere:1.7.1'
     compile 'com.github.johnkil.android-robototextview:robototextview:3.0.0'
-}
-
-publish {
-    groupId = 'com.github.VyacheslavShmakin'
-    artifactId = 'material-searchview'
-    publishVersion = '1.1.2'
-    desc = 'A search view library for Android based on DialogFragment'
-    licences = ['Apache-2.0']
-    website = 'https://github.com/VyacheslavShmakin/Material-SearchView.git'
 }

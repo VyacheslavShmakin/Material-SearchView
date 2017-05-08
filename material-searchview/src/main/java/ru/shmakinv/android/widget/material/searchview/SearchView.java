@@ -32,8 +32,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import com.devspark.robototextview.util.RobotoTypefaceManager;
-import com.devspark.robototextview.util.RobotoTypefaceUtils;
+import com.devspark.robototextview.RobotoTypefaces;
 import com.transitionseverywhere.TransitionManager;
 import com.transitionseverywhere.TransitionSet;
 
@@ -45,7 +44,7 @@ import ru.shmakinv.android.widget.material.searchview.transition.SizeTransition;
  * SearchView
  *
  * @author Vyacheslav Shmakin
- * @version 20.03.2016
+ * @version 19.04.2017
  */
 public class SearchView extends BaseRestoreInstanceFragment implements
         DialogInterface.OnShowListener,
@@ -109,10 +108,10 @@ public class SearchView extends BaseRestoreInstanceFragment implements
             mSuggestionsView.addItemDecoration(mDecoration);
         }
 
-        Typeface typeface = RobotoTypefaceManager.obtainTypeface(
+        Typeface typeface = RobotoTypefaces.obtainTypeface(
                 getActivity().getApplicationContext(),
                 this.mTypefaceValue);
-        RobotoTypefaceUtils.setUp(mSearchEditText, typeface);
+        RobotoTypefaces.setUpTypeface(mSearchEditText, typeface);
 
         mSearchEditText.setText(mQuery);
         mSearchEditText.setHint(mHint);
@@ -280,12 +279,12 @@ public class SearchView extends BaseRestoreInstanceFragment implements
     public void setTypeface(int typefaceValue) {
         setupTypeface(typefaceValue);
 
-        Typeface typeface = RobotoTypefaceManager.obtainTypeface(
+        Typeface typeface = RobotoTypefaces.obtainTypeface(
                 getActivity().getApplicationContext(),
                 typefaceValue);
 
         if (mSearchEditText != null) {
-            RobotoTypefaceUtils.setUp(mSearchEditText, typeface);
+            RobotoTypefaces.setUpTypeface(mSearchEditText, typeface);
         }
     }
 

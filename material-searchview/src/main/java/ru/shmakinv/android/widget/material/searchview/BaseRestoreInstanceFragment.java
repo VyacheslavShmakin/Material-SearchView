@@ -25,7 +25,7 @@ import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
 import android.view.inputmethod.InputMethodManager;
 
-import com.devspark.robototextview.util.RobotoTypefaceManager;
+import com.devspark.robototextview.RobotoTypefaces;
 
 import java.util.List;
 
@@ -33,22 +33,23 @@ import java.util.List;
  * BaseRestoreInstanceFragment
  *
  * @author Vyacheslav Shmakin
- * @version 01.01.2016
+ * @version 19.04.2017
  */
 abstract class BaseRestoreInstanceFragment extends DialogFragment {
 
-    private static final String REQUEST_CLOSE_INSTANCE = "ru.shmakinv.android.widget.material.searchview.BaseRestoreInstanceFragment.flag.closeRequested";
-    private static final String VISIBILITY_INSTANCE = "ru.shmakinv.android.widget.material.searchview.BaseRestoreInstanceFragment.flag.visible";
-    private static final String QUERY_INSTANCE = "ru.shmakinv.android.widget.material.searchview.BaseRestoreInstanceFragment.text.query";
-    private static final String HINT_INSTANCE = "ru.shmakinv.android.widget.material.searchview.BaseRestoreInstanceFragment.text.hint";
-    private static final String CURSOR_POSITION_INSTANCE = "ru.shmakinv.android.widget.material.searchview.BaseRestoreInstanceFragment.position.cursor";
-    private static final String TYPEFACE_INSTANCE = "ru.shmakinv.android.widget.material.searchview.BaseRestoreInstanceFragment.typeface.value";
+    private static final String KEY_CLOSE_REQUESTED = "is-close-requested";
+    private static final String KEY_VISIBLE = "is-visible";
+    private static final String KEY_QUERY = "last-query";
+    private static final String KEY_HINT = "hint";
+    private static final String KEY_CURSOR_POSITION = "last-cursor-position";
+    private static final String KEY_TYPEFACE = "last-typeface";
     private static final long ANIMATOR_DURATION_SHOW = 300L;
-    protected static final String DIALOG_TAG = "ru.shmakinv.android.widget.material.searchview.BaseRestoreInstanceFragment.tag";
+    protected static final String DIALOG_TAG = "BaseRestoreInstanceFragment";
     protected static final long ANIMATOR_MIN_SUGGESTION_DURATION = 50L;
     protected static final long ANIMATOR_MAX_SUGGESTION_DURATION = 200L;
 
     protected Integer mMenuItemId = null;
+    @SuppressWarnings("FieldCanBeLocal")
     private float mAnimProportionX = -1;
 
     protected boolean mVisible = false;
@@ -58,19 +59,19 @@ abstract class BaseRestoreInstanceFragment extends DialogFragment {
     protected String mQuery = null;
     protected String mHint = null;
     protected int mSelection = -1;
-    protected int mTypefaceValue = RobotoTypefaceManager.Typeface.ROBOTO_REGULAR;
+    protected int mTypefaceValue = RobotoTypefaces.TYPEFACE_ROBOTO_REGULAR;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         if (savedInstanceState != null) {
-            this.mVisible = savedInstanceState.getBoolean(VISIBILITY_INSTANCE);
-            this.mCloseRequested = savedInstanceState.getBoolean(REQUEST_CLOSE_INSTANCE);
-            this.mQuery = savedInstanceState.getString(QUERY_INSTANCE, null);
-            this.mHint = savedInstanceState.getString(HINT_INSTANCE, null);
-            this.mSelection = savedInstanceState.getInt(CURSOR_POSITION_INSTANCE, mSelection);
-            this.mTypefaceValue = savedInstanceState.getInt(TYPEFACE_INSTANCE, mTypefaceValue);
+            this.mVisible = savedInstanceState.getBoolean(KEY_VISIBLE);
+            this.mCloseRequested = savedInstanceState.getBoolean(KEY_CLOSE_REQUESTED);
+            this.mQuery = savedInstanceState.getString(KEY_QUERY, null);
+            this.mHint = savedInstanceState.getString(KEY_HINT, null);
+            this.mSelection = savedInstanceState.getInt(KEY_CURSOR_POSITION, mSelection);
+            this.mTypefaceValue = savedInstanceState.getInt(KEY_TYPEFACE, mTypefaceValue);
         }
     }
 
@@ -93,12 +94,12 @@ abstract class BaseRestoreInstanceFragment extends DialogFragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean(VISIBILITY_INSTANCE, this.mVisible);
-        outState.putBoolean(REQUEST_CLOSE_INSTANCE, this.mCloseRequested);
-        outState.putString(QUERY_INSTANCE, this.mQuery);
-        outState.putString(HINT_INSTANCE, this.mHint);
-        outState.putInt(CURSOR_POSITION_INSTANCE, this.mSelection);
-        outState.putInt(TYPEFACE_INSTANCE, this.mTypefaceValue);
+        outState.putBoolean(KEY_VISIBLE, this.mVisible);
+        outState.putBoolean(KEY_CLOSE_REQUESTED, this.mCloseRequested);
+        outState.putString(KEY_QUERY, this.mQuery);
+        outState.putString(KEY_HINT, this.mHint);
+        outState.putInt(KEY_CURSOR_POSITION, this.mSelection);
+        outState.putInt(KEY_TYPEFACE, this.mTypefaceValue);
     }
 
     @Override
@@ -118,7 +119,7 @@ abstract class BaseRestoreInstanceFragment extends DialogFragment {
         this.mQuery = null;
         this.mHint = null;
         this.mSelection = -1;
-        this.mTypefaceValue = RobotoTypefaceManager.Typeface.ROBOTO_REGULAR;
+        this.mTypefaceValue = RobotoTypefaces.TYPEFACE_ROBOTO_REGULAR;
     }
 
     public boolean isShown() {
@@ -148,6 +149,7 @@ abstract class BaseRestoreInstanceFragment extends DialogFragment {
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
+                    //noinspection ConstantConditions
                     getDialog().getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
                     onShowSearchAnimationEnd();
                 }
@@ -167,12 +169,13 @@ abstract class BaseRestoreInstanceFragment extends DialogFragment {
         } else {
             view.setVisibility(View.VISIBLE);
             showKeyboard();
+            //noinspection ConstantConditions
             getDialog().getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
             onShowSearchAnimationEnd();
         }
     }
 
-    protected void animateDismiss(final View view, final View metricsView, final int itemId) {
+    protected void animateDismiss(@NonNull final View view, @NonNull final View metricsView, final int itemId) {
         if (!mCloseAnimationRunning) {
             mCloseAnimationRunning = true;
         } else {
@@ -218,7 +221,8 @@ abstract class BaseRestoreInstanceFragment extends DialogFragment {
         }
     }
 
-    protected void finishClosing(View view) {
+    protected void finishClosing(@NonNull View view) {
+        //noinspection ConstantConditions
         getDialog().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         hideKeyboard();
         view.setVisibility(View.INVISIBLE);
@@ -278,7 +282,7 @@ abstract class BaseRestoreInstanceFragment extends DialogFragment {
         }
     };
 
-    protected void onOutsideTouch(View v, MotionEvent event) {
+    protected void onOutsideTouch(@NonNull View v, @NonNull MotionEvent event) {
     }
 
     protected final View.OnTouchListener mOnOutsideTouchListener = new View.OnTouchListener() {

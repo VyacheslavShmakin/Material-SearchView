@@ -20,14 +20,13 @@ import android.content.Context;
 import android.util.AttributeSet;
 
 import com.transitionseverywhere.ChangeBounds;
-import com.transitionseverywhere.EmptyTransition;
 import com.transitionseverywhere.TransitionSet;
 
 /**
  * SizeTransition
  *
  * @author Vyacheslav Shmakin
- * @version 20.12.2015
+ * @version 19.04.2017
  */
 public class SizeTransition extends TransitionSet {
 
